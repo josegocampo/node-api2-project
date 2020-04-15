@@ -4,7 +4,6 @@ const router = express.Router()
 const db = require('../data/db')
 
 
-
 router.post("/", async (req, res, next) =>{
     try{
         if (!req.body.title || !req.body.contents) {
@@ -38,20 +37,6 @@ router.post("/:id/comments", async (req, res, next) =>{
         next(err)
     }
 })
-
-// {
-//     try {
-//         !req.body.text ? res.status(400).json({message: "The text field is required"}) : null
-//         const post = await db.findById(req.params.id);
-//         if (post) {
-//             res.status(201).json(await db.insertComment(req.body))
-//         }
-//     } catch {
-//         res.status(500).json('There was an error while adding your comment')
-//     }
-
-// })
-
 
 router.get("/", async (req, res, next) =>{
         try{
@@ -90,6 +75,26 @@ router.get("/:id/comments", async (req, res, next) =>{
 router.delete("/:id", async (req, res, next) =>{
     try{
         res.json(await db.remove(req.params.id))
+    }
+    catch(err){
+        next(err)
+    }
+})
+
+router.put("/:id", async (req, res, next) =>{
+    try{
+        const post = await db.findById(req.params.id)
+
+        if (post.length <= 0){
+            res.status(404).json({message: "The post with the specified ID does not exist." })
+        }
+        else{
+          if(!req.body.title && !req.body.contents){
+              console.log(req.body)
+              res.status(400).json({errorMessage: "Please provide title and contents for the post."})
+          }console.log(req.body)
+         res.json(await db.update(post, req.body))
+        }
     }
     catch(err){
         next(err)
